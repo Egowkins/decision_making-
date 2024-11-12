@@ -1,8 +1,11 @@
 from os import get_terminal_size
+from sys import exception
 
 import numpy as np
 import pandas as pd
 import math
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 class R_Matrix():
@@ -136,8 +139,8 @@ class R_Matrix():
         answ = np.zeros(self.get_width())
 
         for i in range(self.get_width()):
-
-            answ[i] = sum(ans.iloc[i]) / self.get_width()
+            #print(self.get_length())
+            answ[i] = round(sum(ans.iloc[i]) / self.get_length(),2)
 
         i_win = np.where(answ == answ.max())
         win = answ[i_win]
@@ -181,8 +184,10 @@ class R_Matrix():
 
 
     def baies(self, p:(list, np.array))->set:
-        if sum(p) > 1 or sum(p) != 1:
-            print('Обратите внимание, что вероятности в сумме не дают 1')
+
+        if sum(p) != 1:
+            raise ValueError('Сумма вероятностей не равна 0')
+
         ans = self.get_matrix()
         answ = np.zeros(self.get_width())
 
@@ -192,7 +197,7 @@ class R_Matrix():
             #ans.iloc[i] = ans.iloc[i] * p[i]
         i_win = np.where(answ == answ.max())
         win = answ[i_win]
-        print(ans)
+        #print(ans)
 
         return answ, win
 
@@ -201,14 +206,50 @@ class R_Matrix():
 if __name__ == '__main__':
     a = R_Matrix()
     a.fill_matrix('risk/risk.xlsx', True, True)
-
+    print(f'{'-' * 70}')
+    print(f'{'-' * 70}')
+    print('Исходная матрица:')
     print(a.get_matrix())
+    print(f'{'-' * 70}')
+    print(f'{'-' * 70}')
+    print('Матрица рисков:')
     print(a.risk_matrix())
+    print(f'{'-' * 70}')
+    print(f'{'-' * 70}')
+    print('Критерий Вальда')
     #print(a.__names)
-    print(a.vald_cr())
-    print(a.maximax())
-    print(a.laplas())
-    print(a.sevidg())
-    print(a.gurvic(0.5))
-    print(a.baies([0.5, 0.3, 0.1, 0.1]))
+    abob = a.vald_cr()
+    print(f'\nМассив полученных значений :{abob[0].tolist()} \nЗначение, подходящее под критерии: {int(abob[1])}'
+          f'\nНомер выйгрышной стратегии: {int(np.where(abob[0] == abob[1])[0])+1}')
+    #print(a.vald_cr())
+    print(f'{'-' * 70}')
+    print('Критерий Максимакса')
+    abob = a.maximax()
+    print(f'\nМассив полученных значений :{abob[0].tolist()} \nЗначение, подходящее под критерии: {int(abob[1])}'
+          f'\nНомер выйгрышной стратегии: {int(np.where(abob[0] == abob[1])[0])+1}')
+   # print(a.maximax())
+    print(f'{'-' * 70}')
+    print('Критерий Лапласа')
+    abob = a.laplas()
+    print(f'\nМассив полученных значений :{abob[0].tolist()} \nЗначение, подходящее под критерии: {int(abob[1])}'
+          f'\nНомер выйгрышной стратегии: {int(np.where(abob[0] == abob[1])[0])+1}')
+    #print(a.laplas())
+    print(f'{'-' * 70}')
+    print('Критерий Севиджа')
+    abob = a.sevidg()
+    print(f'\nМассив полученных значений :{abob[0].tolist()} \nЗначение, подходящее под критерии: {int(abob[1])}'
+          f'\nНомер выйгрышной стратегии: {int(np.where(abob[0] == abob[1])[0])+1}')
+    #print(a.sevidg())
+    print(f'{'-' * 70}')
+    print('Критерий Гурвица')
+    abob = a.gurvic(0.5)
+    print(f'\nМассив полученных значений :{abob[0].tolist()} \nЗначение, подходящее под критерии: {int(abob[1])}'
+          f'\nНомер выйгрышной стратегии: {int(np.where(abob[0] == abob[1])[0])+1}')
+    #print(a.gurvic(0.5))
+    print(f'{'-' * 70}')
+    print('Критерий Байеса')
+    abob = a.baies([0.5, 0.3, 0.1, 0.1])
+    print(f'\nМассив полученных значений :{abob[0].tolist()} \nЗначение, подходящее под критерии: {int(abob[1])}'
+          f'\nНомер выйгрышной стратегии: {int(np.where(abob[0] == abob[1])[0])+1}')
+    #print(a.baies([0.5, 0.3, 0.1, 0.1]))
 
